@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window) {
+void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const unordered_set<pair<int, int>, pair_hash>& obstacles) {
     int maxSteps = 0;
     for (const auto& agent : agents) {
         maxSteps = max(maxSteps, (int)agent.path.size());
@@ -26,12 +26,16 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window) {
                 }
             }
 
-            // Draw the grid
+            // Draw the grid and obstacles
             for (int i = 0; i < GRID_SIZE; ++i) {
                 for (int j = 0; j < GRID_SIZE; ++j) {
                     sf::RectangleShape cell(sf::Vector2f(CELL_SIZE - 1, CELL_SIZE - 1));
                     cell.setPosition(i * CELL_SIZE, j * CELL_SIZE);
-                    cell.setFillColor(sf::Color::White);
+                    if (obstacles.find({i, j}) != obstacles.end()) {
+                        cell.setFillColor(sf::Color::Black);
+                    } else {
+                        cell.setFillColor(sf::Color::White);
+                    }
                     cell.setOutlineThickness(1);
                     cell.setOutlineColor(sf::Color::Black);
                     window.draw(cell);
@@ -75,4 +79,3 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window) {
         }
     }
 }
-

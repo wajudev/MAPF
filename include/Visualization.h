@@ -8,9 +8,10 @@
 #include "Agent.h"
 #include "Constants.h"
 #include <SFML/Graphics.hpp>
-#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
-void simulateAgents(const std::vector<Agent>& agents, sf::RenderWindow& window);
+void simulateAgents(const std::vector<Agent>& agents, sf::RenderWindow& window, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
+
 
 #endif //MAPF_VISUALIZATION_H

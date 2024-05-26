@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <queue>
+#include <unordered_set>
 #include <unordered_map>
 
 struct pair_hash {
@@ -33,8 +34,10 @@ struct Agent {
     std::unordered_map<std::pair<int, int>, int, pair_hash> fScore;
 };
 
-std::vector<Agent> initializeAgents(int numAgents);
-void initializePaths(std::vector<Agent>& agents);
+std::vector<Agent> initializeAgents(int numAgents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
+void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, int& makeSpan, int& sumOfCosts);
 int manhattanDistance(std::pair<int, int> a, std::pair<int, int> b);
+void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::vector<Agent>& agents);
+std::unordered_set<std::pair<int, int>, pair_hash> generateObstacles(int numObstacles);
 
 #endif //MAPF_AGENT_H
