@@ -12,7 +12,7 @@
 #include <random>
 
 void generateNeighbor(std::vector<Agent>& agents, std::mt19937& gen, std::uniform_int_distribution<>& agentDist, std::uniform_int_distribution<>& directionDist);
-void simulatedAnnealing(std::vector<Agent>& agents);
-int calculateCost(const std::vector<Agent>& agents);
+void simulatedAnnealing(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
+int calculateCost(const std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
 
 #endif //MAPF_SIMULATEDANNEALING_H

@@ -51,7 +51,7 @@ std::vector<Agent> initializeAgents(int numAgents, const std::unordered_set<std:
                 break;
         }
         shape->setFillColor(colors[i % colors.size()]);
-        agents.push_back(Agent{ i, {startX, startY}, {goalX, goalY}, {}, colors[i % colors.size()], shape });
+        agents.emplace_back(Agent{ i, {startX, startY}, {goalX, goalY}, {}, colors[i % colors.size()], shape });
     }
     return agents;
 }
@@ -129,8 +129,8 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
         agent.fScore.clear();
         while (!agent.openSet.empty()) agent.openSet.pop();
         aStar(agent, obstacles, agents);
-        makespan = std::max(makespan, (int)agent.path.size());
-        sumOfCosts += agent.path.size();
+        makespan = std::max(makespan, (int) agent.path.size());
+        sumOfCosts += (int) agent.path.size();
 
         // Debug: Print the path for each agent
         std::cout << "Path for agent " << agent.id << ": ";

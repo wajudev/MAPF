@@ -23,7 +23,7 @@ int main() {
 
     int makespan, sumOfCosts;
     initializePaths(agents, obstacles, makespan, sumOfCosts);
-    simulatedAnnealing(agents);
+    simulatedAnnealing(agents, obstacles);
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
