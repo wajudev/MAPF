@@ -79,18 +79,3 @@ This project is a Multi-Agent Path Finding (MAPF) visualizer that computes colli
 
 ## Usage
 
-1. **Enter the number of agents**:
-    - You will be prompted to enter the number of agents.
-2. **Enter the start and goal positions for each agent**:
-    - For each agent, you will enter the start and goal coordinates (x y).
-
-The simulation will then run, displaying the agents moving towards their goals while avoiding collisions with each other and obstacles.
-
-## Example
-
-```sh
-Enter the number of agents: 2
-Enter start (x y) for agent 0: 1 1
-Enter goal (x y) for agent 0: 8 8
-Enter start (x y) for agent 1: 8 1
-Enter goal (x y) for agent 1: 1 8
