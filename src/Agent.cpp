@@ -131,6 +131,13 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
         aStar(agent, obstacles, agents);
         makespan = std::max(makespan, (int)agent.path.size());
         sumOfCosts += agent.path.size();
+
+        // Debug: Print the path for each agent
+        std::cout << "Path for agent " << agent.id << ": ";
+        for (const auto& step : agent.path) {
+            std::cout << "(" << step.first << ", " << step.second << ") ";
+        }
+        std::cout << std::endl;
     }
 }
 

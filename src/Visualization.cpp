@@ -64,7 +64,7 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const
             }
 
             window.display();
-            this_thread::sleep_for(chrono::milliseconds(500)); // Slow down the simulation for visualization purposes
+            this_thread::sleep_for(chrono::milliseconds(1000)); // Slow down the simulation for visualization purposes
 
             // Handle events to keep the window open
             sf::Event event;
