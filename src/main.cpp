@@ -5,18 +5,21 @@
 #include "../include/SimulatedAnnealing.h"
 #include "../include/Visualization.h"
 #include "../include/Constants.h"
+#include "../include/Utils.h"
 
 using namespace std::chrono;
 
+int GRID_SIZE;
+
 int main() {
-    int numAgents;
-    std::cout << "Enter the number of agents: ";
-    std::cin >> numAgents;
+    std::unordered_set<std::pair<int, int>, pair_hash> obstacles;
+    std::vector<Agent> agents;
 
-    int numObstacles = 10; // Adjust as needed
-    auto obstacles = generateObstacles(numObstacles);
+    // Load data from file
+    std::string filename = "instances/example_1.txt";
+    loadFromFile(filename, GRID_SIZE, obstacles, agents);
 
-    std::vector<Agent> agents = initializeAgents(numAgents, obstacles);
+    std::cout << "Finished loading data from file.  Grid Size: " << GRID_SIZE << std::endl; // Debug
     sf::RenderWindow window(sf::VideoMode(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE), "MAPF Simulation");
 
     auto start = high_resolution_clock::now();

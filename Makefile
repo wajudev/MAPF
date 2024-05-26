@@ -8,7 +8,7 @@ CXXFLAGS = -std=c++2b -Iinclude
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
 # Source files
-SRC = src/Agent.cpp src/SimulatedAnnealing.cpp src/Visualization.cpp src/main.cpp
+SRC = src/Agent.cpp src/SimulatedAnnealing.cpp src/Visualization.cpp src/main.cpp src/Utils.cpp
 
 # Object files directory
 OBJDIR = build

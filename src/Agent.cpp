@@ -1,60 +1,12 @@
 #include "../include/Agent.h"
 #include "../include/Constants.h"
 #include <iostream>
-#include <cmath>
-#include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
-#include <ctime>
 #include <random>
-
-
-std::vector<Agent> initializeAgents(int numAgents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles) {
-    std::vector<sf::Color> colors = {
-            sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Yellow,
-            sf::Color::Cyan, sf::Color::Magenta, sf::Color::White, sf::Color::Black,
-            sf::Color(255, 165, 0), // Orange
-            sf::Color(128, 0, 128)  // Purple
-    };
-
-    std::vector<Agent> agents;
-    for (int i = 0; i < numAgents; ++i) {
-        int startX, startY, goalX, goalY;
-        std::cout << "Enter start (x y) for agent " << i << ": ";
-        std::cin >> startX >> startY;
-        std::cout << "Enter goal (x y) for agent " << i << ": ";
-        std::cin >> goalX >> goalY;
-
-        // Ensure start and goal positions are not on obstacles
-        while (obstacles.find({startX, startY}) != obstacles.end() || obstacles.find({goalX, goalY}) != obstacles.end()) {
-            std::cout << "Start or goal position is on an obstacle. Please re-enter positions.\n";
-            std::cout << "Enter start (x y) for agent " << i << ": ";
-            std::cin >> startX >> startY;
-            std::cout << "Enter goal (x y) for agent " << i << ": ";
-            std::cin >> goalX >> goalY;
-        }
-
-        // Create a shape for the agent
-        sf::Shape* shape;
-        switch (i % 3) {
-            case 0: // Circle
-                shape = new sf::CircleShape(CELL_SIZE / 2 - 2);
-                break;
-            case 1: // Square
-                shape = new sf::RectangleShape(sf::Vector2f(CELL_SIZE - 4, CELL_SIZE - 4));
-                break;
-            case 2: // Triangle
-                shape = new sf::CircleShape(CELL_SIZE / 2 - 2, 3);
-                break;
-        }
-        shape->setFillColor(colors[i % colors.size()]);
-        agents.emplace_back(Agent{ i, {startX, startY}, {goalX, goalY}, {}, colors[i % colors.size()], shape });
-    }
-    return agents;
-}
 
 std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> node, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles) {
     std::vector<std::pair<int, int>> neighbors;
@@ -76,6 +28,7 @@ void reconstructPath(Agent& agent, std::pair<int, int> current) {
 }
 
 void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::vector<Agent>& agents) {
+    std::cout << "Running A* for agent " << agent.id << " from (" << agent.start.first << ", " << agent.start.second << ") to (" << agent.goal.first << ", " << agent.goal.second << ")" << std::endl;
     agent.openSet.emplace(0, agent.start);
     agent.gScore[agent.start] = 0;
     agent.fScore[agent.start] = manhattanDistance(agent.start, agent.goal);
@@ -86,6 +39,11 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
 
         if (current == agent.goal) {
             reconstructPath(agent, current);
+            std::cout << "Path found for agent " << agent.id << ": ";
+            for (const auto& step : agent.path) {
+                std::cout << "(" << step.first << ", " << step.second << ") ";
+            }
+            std::cout << std::endl;
             return;
         }
 
@@ -117,6 +75,7 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
             }
         }
     }
+    std::cout << "No path found for agent " << agent.id << std::endl;
 }
 
 void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, int& makespan, int& sumOfCosts) {
@@ -131,13 +90,6 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
         aStar(agent, obstacles, agents);
         makespan = std::max(makespan, (int) agent.path.size());
         sumOfCosts += (int) agent.path.size();
-
-        // Debug: Print the path for each agent
-        std::cout << "Path for agent " << agent.id << ": ";
-        for (const auto& step : agent.path) {
-            std::cout << "(" << step.first << ", " << step.second << ") ";
-        }
-        std::cout << std::endl;
     }
 }
 

@@ -10,9 +10,11 @@
 using namespace std;
 
 void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const unordered_set<pair<int, int>, pair_hash>& obstacles) {
-    int maxSteps = 0;
+    size_t maxSteps = 0;
     for (const auto& agent : agents) {
-        maxSteps = max(maxSteps, (int)agent.path.size());
+        if (agent.path.size() > maxSteps) {
+            maxSteps = agent.path.size();
+        }
     }
 
     while (window.isOpen()) {

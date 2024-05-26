@@ -6,7 +6,7 @@
 #define MAPF_CONSTANTS_H
 
 // Define the grid size and cell size
-const int GRID_SIZE = 10;
+extern int GRID_SIZE;
 const int CELL_SIZE = 50; // Size of each cell in pixels
 
 #endif //MAPF_CONSTANTS_H
