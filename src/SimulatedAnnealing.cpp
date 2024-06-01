@@ -56,17 +56,14 @@ void generateNeighbor(vector<Agent>& agents, mt19937& gen, uniform_int_distribut
     }
 }
 
-void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int>, pair_hash>& obstacles) {
+void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int>, pair_hash>& obstacles, double initialTemp, double coolingRate, int maxIterations) {
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> agentDist(0, (int) agents.size() - 1);
     uniform_int_distribution<> directionDist(0, 3);
     uniform_real_distribution<> acceptanceDist(0.0, 1.0);
 
-    double T = 1000.0;
-    double coolingRate = 0.999;
-    int maxIterations = 5000;
-
+    double T = initialTemp;
     int currentCost = calculateCost(agents, obstacles);
     vector<Agent> bestSolution = agents;
     int bestCost = currentCost;

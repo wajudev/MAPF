@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <unordered_set>
 #include "../include/Agent.h"
 #include "../include/SimulatedAnnealing.h"
 #include "../include/Visualization.h"
@@ -14,10 +15,17 @@ int GRID_SIZE;
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <filename> [configFile]" << std::endl;
     }
 
     std::string filename = argv[1];
+    std::string configFile = (argc > 2) ? argv[2] : "config.txt";
+    std::unordered_map<std::string, std::string> config = readConfigFile(configFile);
+
+    double initialTemp = config.count("initialTemp") ? std::stod(config["initialTemp"]) : 1000.0;
+    double coolingRate = config.count("coolingRate") ? std::stod(config["coolingRate"]) : 0.999;
+    int maxIterations = config.count("maxIterations") ? std::stod(config["maxIterations"]) : 5000;
+
     std::unordered_set<std::pair<int, int>, pair_hash> obstacles;
     std::vector<Agent> agents;
 
@@ -31,7 +39,8 @@ int main(int argc, char* argv[]) {
 
     int makespan, sumOfCosts;
     initializePaths(agents, obstacles, makespan, sumOfCosts);
-    simulatedAnnealing(agents, obstacles);
+
+    simulatedAnnealing(agents, obstacles, initialTemp, coolingRate, maxIterations);
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);

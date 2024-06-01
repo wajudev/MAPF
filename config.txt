@@ -1,0 +1,3 @@
+initialTemp = 1000.0
+coolingRate = 0.999
+maxIterations = 5000

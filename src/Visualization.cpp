@@ -18,7 +18,7 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const
     }
 
     while (window.isOpen()) {
-        for (int t = 0; t <= maxSteps; ++t) {
+        for (size_t t = 0; t <= maxSteps; ++t) {
             window.clear(sf::Color::White);
 
             unordered_map<pair<int, int>, int, pair_hash> positionCount;

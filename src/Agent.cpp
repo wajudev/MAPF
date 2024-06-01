@@ -48,7 +48,7 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
         }
 
         for (auto neighbor : getNeighbors(current, obstacles)) {
-            int tentative_gScore = agent.gScore[current] + 1;
+            size_t tentative_gScore = agent.gScore[current] + 1;
 
             // Check for collisions with other agents
             bool collision = false;
@@ -97,7 +97,7 @@ int manhattanDistance(std::pair<int, int> a, std::pair<int, int> b) {
     return abs(a.first - b.first) + abs(a.second - b.second);
 }
 
-std::unordered_set<std::pair<int, int>, pair_hash> generateObstacles(int numObstacles) {
+std::unordered_set<std::pair<int, int>, pair_hash> generateObstacles(size_t numObstacles) {
     std::unordered_set<std::pair<int, int>, pair_hash> obstacles;
     std::random_device rd;
     std::mt19937 gen(rd());

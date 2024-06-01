@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++2b -Iinclude
+CXXFLAGS = -std=c++2b -Wall -Wextra
 
 # Linker flags
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system

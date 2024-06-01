@@ -41,7 +41,7 @@ This project is a Multi-Agent Path Finding (MAPF) visualizer that computes colli
 
 4. **Run the Application**:
     ```sh
-    ./mapf_visualizer <filename>
+    ./mapf_visualizer <filename> [configfile]
     ```
 
 ### Windows
@@ -68,7 +68,7 @@ This project is a Multi-Agent Path Finding (MAPF) visualizer that computes colli
 
 4. **Run the Application**:
     ```sh
-    ./mapf_visualizer.exe <filename>
+    ./mapf_visualizer.exe <filename> [configfile]
     ```
 
 ## Usage

@@ -75,3 +75,27 @@ void loadFromFile(const std::string &filename, int &gridSize, std::unordered_set
         agents.emplace_back(Agent{agentId, {startX, startY}, {goalX, goalY}, {}, colors[i % colors.size()], shape});
     }
 }
+
+std::unordered_map<std::string, std::string> readConfigFile(const std::string& filename) {
+    std::unordered_map<std::string, std::string> config;
+    std::ifstream file(filename);
+    std::string line;
+
+    if (!file.is_open()) {
+        std::cerr << "Unable to open config file: " << filename << std::endl;
+        return config;
+    }
+
+    while (std::getline(file, line)) {
+        std::istringstream lineStream(line);
+        std::string key;
+        if (std::getline(lineStream, key, '=')) {
+            std::string value;
+            if (std::getline(lineStream, value)) {
+                config[key] = value;
+            }
+        }
+    }
+    file.close();
+    return config;
+}
