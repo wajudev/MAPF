@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 #include <chrono>
 #include "../include/Agent.h"
 #include "../include/SimulatedAnnealing.h"
@@ -11,12 +12,16 @@ using namespace std::chrono;
 
 int GRID_SIZE;
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+    }
+
+    std::string filename = argv[1];
     std::unordered_set<std::pair<int, int>, pair_hash> obstacles;
     std::vector<Agent> agents;
 
     // Load data from file
-    std::string filename = "instances/example_1.txt";
     loadFromFile(filename, GRID_SIZE, obstacles, agents);
 
     std::cout << "Finished loading data from file.  Grid Size: " << GRID_SIZE << std::endl; // Debug

@@ -33,18 +33,15 @@ This project is a Multi-Agent Path Finding (MAPF) visualizer that computes colli
     ```
 
 3. **Build the Project**:
-    - Create a directory for the build files:
-      ```sh
-      mkdir build
-      ```
     - Compile the project using the provided Makefile:
       ```sh
+      make clean
       make
       ```
 
 4. **Run the Application**:
     ```sh
-    ./mapf_visualizer
+    ./mapf_visualizer <filename>
     ```
 
 ### Windows
@@ -63,18 +60,15 @@ This project is a Multi-Agent Path Finding (MAPF) visualizer that computes colli
 3. **Build the Project**:
     - Ensure you have a C++ compiler installed (e.g., MinGW).
     - Update the `Makefile` if necessary to point to the correct SFML include and library directories.
-    - Create a directory for the build files:
-      ```sh
-      mkdir build
-      ```
     - Compile the project using the provided Makefile:
       ```sh
-      make
+      make clean
+      make 
       ```
 
 4. **Run the Application**:
     ```sh
-    ./mapf_visualizer.exe
+    ./mapf_visualizer.exe <filename>
     ```
 
 ## Usage
