@@ -54,6 +54,8 @@ void generateNeighbor(vector<Agent>& agents, mt19937& gen, uniform_int_distribut
     }
 
     if (newPos.first >= 0 && newPos.first < GRID_SIZE && newPos.second >= 0 && newPos.second < GRID_SIZE && obstacles.find(newPos) == obstacles.end()) {
+        if (pathIdx > 0 && newPos != agents[agentIdx].path[pathIdx - 1]) return;
+        if (pathIdx < agents[agentIdx].path.size() - 1 && newPos != agents[agentIdx].path[pathIdx + 1]) return;
         agents[agentIdx].path[pathIdx] = newPos;
     }
 }
@@ -137,8 +139,9 @@ SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_se
             sumOfCosts += static_cast<int>(agent.path.size());
         }
 
-        std::cout << "Config: T=" << conf.initialTemp << ", CR=" << conf.coolingRate << ", Iter=" << conf.maxIterations
-                  << " | Cost: " << currentCost << ", Makespan: " << makespan << ", Sum of Costs: " << sumOfCosts << ", Duration: " << duration.count() << "ms" << std::endl;
+        // For Debugging
+        //std::cout << "Config: T=" << conf.initialTemp << ", CR=" << conf.coolingRate << ", Iter=" << conf.maxIterations
+        //          << " | Cost: " << currentCost << ", Makespan: " << makespan << ", Sum of Costs: " << sumOfCosts << ", Duration: " << duration.count() << "ms" << std::endl;
 
         if (currentCost < bestCost) {
             bestConfig = conf;
