@@ -6,10 +6,11 @@
 #include "../include/Constants.h"
 #include "../include/SimulatedAnnealing.h"
 #include <thread>
+#include <iostream>
 
-using namespace std;
+std::string FONT_COURIER = "resources/Courier_New.ttf";
 
-void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const unordered_set<pair<int, int>, pair_hash>& obstacles) {
+void simulateAgents(const std::vector<Agent>& agents, sf::RenderWindow& window, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const SAConfig& bestConfig, int bestMakespan, int bestCost) {
     size_t maxSteps = 0;
     for (const auto& agent : agents) {
         if (agent.path.size() > maxSteps) {
@@ -17,11 +18,22 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const
         }
     }
 
+    sf::Font font;
+    if(!font.loadFromFile(FONT_COURIER)) {
+        std::cerr << "Error loading fonts" << std::endl;
+        return;
+    }
+
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(16);
+    text.setFillColor(sf::Color::Black);
+
     while (window.isOpen()) {
         for (size_t t = 0; t <= maxSteps; ++t) {
             window.clear(sf::Color::White);
 
-            unordered_map<pair<int, int>, int, pair_hash> positionCount;
+            std::unordered_map<std::pair<int, int>, int, pair_hash> positionCount;
             for (const auto& agent : agents) {
                 if (t < agent.path.size()) {
                     positionCount[agent.path[t]]++;
@@ -65,8 +77,17 @@ void simulateAgents(const vector<Agent>& agents, sf::RenderWindow& window, const
                 }
             }
 
+            // Display best configuration details
+            std::ostringstream ss;
+            ss << "Best Config: T=" << bestConfig.initialTemp << ", CR=" << bestConfig.coolingRate << ", Iter=" << bestConfig.maxIterations
+               << "\n Best Makespan: " << bestMakespan << ", Best Cost: " << bestCost;
+
+            text.setString(ss.str());
+            text.setPosition(10, GRID_SIZE * CELL_SIZE + 10);
+            window.draw(text);
+
             window.display();
-            this_thread::sleep_for(chrono::milliseconds(1000)); // Slow down the simulation for visualization purposes
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Slow down the simulation for visualization purposes
 
             // Handle events to keep the window open
             sf::Event event;

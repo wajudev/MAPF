@@ -53,9 +53,22 @@ void generateNeighbor(vector<Agent>& agents, mt19937& gen, uniform_int_distribut
         default: break;
     }
 
+    // Ensure the move is within grid bounds and not on an obstacle
     if (newPos.first >= 0 && newPos.first < GRID_SIZE && newPos.second >= 0 && newPos.second < GRID_SIZE && obstacles.find(newPos) == obstacles.end()) {
+        // Ensure the new position is adjacent to the previous and next positions in the path
         if (pathIdx > 0 && newPos != agents[agentIdx].path[pathIdx - 1]) return;
         if (pathIdx < agents[agentIdx].path.size() - 1 && newPos != agents[agentIdx].path[pathIdx + 1]) return;
+
+        // Check for collision with other agents
+        for (const auto& agent : agents) {
+            if (agentIdx != agent.id) {
+                if (!agent.path.empty() && newPos == agent.goal && agent.path.back() == agent.goal) return; // Do not move into the position of an agent's goal if agent is there
+                for (const auto& pos : agent.path) {
+                    if (newPos == pos) return;
+                }
+            }
+        }
+        // If all constraints are satisfied, update the position
         agents[agentIdx].path[pathIdx] = newPos;
     }
 }
@@ -71,6 +84,11 @@ void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int
     int currentCost = calculateCost(agents, obstacles);
     vector<Agent> bestSolution = agents;
     int bestCost = currentCost;
+
+    unordered_set<pair<int, int>, pair_hash> goals;
+    for (const auto& agent : agents) {
+        goals.insert(agent.goal);
+    }
 
     for (int iter = 0; iter < maxIterations && T > 1e-5; ++iter) {
         vector<Agent> newSolution = agents;

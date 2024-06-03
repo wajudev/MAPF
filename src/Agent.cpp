@@ -14,6 +14,10 @@ std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> node, const st
     if (node.first < GRID_SIZE - 1 && obstacles.find({node.first + 1, node.second}) == obstacles.end()) neighbors.emplace_back(node.first + 1, node.second);
     if (node.second > 0 && obstacles.find({node.first, node.second - 1}) == obstacles.end()) neighbors.emplace_back(node.first, node.second - 1);
     if (node.second < GRID_SIZE - 1 && obstacles.find({node.first, node.second + 1}) == obstacles.end()) neighbors.emplace_back(node.first, node.second + 1);
+
+    // Add wait as a neighbor (the agent stays in place)
+    neighbors.emplace_back(node.first, node.second);
+
     return neighbors;
 }
 
@@ -54,12 +58,18 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
             bool collision = false;
             for (const auto& otherAgent : agents) {
                 if (otherAgent.id != agent.id) {
+                    // Check if neighbor collides with other agents' paths
                     if (!otherAgent.path.empty() && otherAgent.path.size() > tentative_gScore) {
                         if (neighbor == otherAgent.path[tentative_gScore] ||
                             (tentative_gScore > 0 && neighbor == otherAgent.path[tentative_gScore - 1] && current == otherAgent.path[tentative_gScore])) {
                             collision = true;
                             break;
                         }
+                    }
+                    // New check to avoid moving into a goal position of another agent
+                    if (!otherAgent.path.empty() && neighbor == otherAgent.goal && otherAgent.path.back() == otherAgent.goal) {
+                        collision = true;
+                        break;
                     }
                 }
             }

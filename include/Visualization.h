@@ -7,11 +7,12 @@
 
 #include "Agent.h"
 #include "Constants.h"
+#include "SimulatedAnnealing.h"
 #include <SFML/Graphics.hpp>
 #include <unordered_set>
 #include <utility>
 
-void simulateAgents(const std::vector<Agent>& agents, sf::RenderWindow& window, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
+void simulateAgents(const std::vector<Agent>& agents, sf::RenderWindow& window, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const SAConfig& bestConfig, int bestMakespan, int bestCost);
 
 
 #endif //MAPF_VISUALIZATION_H
