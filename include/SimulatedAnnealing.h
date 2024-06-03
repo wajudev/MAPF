@@ -11,6 +11,14 @@
 #include <utility>
 #include <random>
 
+struct SAConfig {
+    double initialTemp;
+    double coolingRate;
+    int maxIterations;
+};
+
+
+SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::unordered_map<std::string, std::string>& config);
 void generateNeighbor(std::vector<Agent>& agents, std::mt19937& gen, std::uniform_int_distribution<>& agentDist, std::uniform_int_distribution<>& directionDist);
 void simulatedAnnealing(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, double initialTemp, double coolingRate, int maxIterations);
 int calculateCost(const std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);

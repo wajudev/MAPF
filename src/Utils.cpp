@@ -99,3 +99,13 @@ std::unordered_map<std::string, std::string> readConfigFile(const std::string& f
     file.close();
     return config;
 }
+
+void resetAgents(std::vector<Agent>& agents) {
+    for (auto& agent : agents) {
+        agent.path.clear();
+        agent.cameFrom.clear();
+        agent.gScore.clear();
+        agent.fScore.clear();
+        while (!agent.openSet.empty()) agent.openSet.pop();
+    }
+}

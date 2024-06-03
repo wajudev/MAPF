@@ -4,6 +4,7 @@
 
 #include "../include/SimulatedAnnealing.h"
 #include "../include/Constants.h"
+#include "../include/Utils.h"
 #include <cmath>
 #include <random>
 #include <algorithm>
@@ -49,6 +50,7 @@ void generateNeighbor(vector<Agent>& agents, mt19937& gen, uniform_int_distribut
         case 1: newPos.first--; break; // Move left
         case 2: newPos.second++; break; // Move down
         case 3: newPos.second--; break; // Move up
+        default: break;
     }
 
     if (newPos.first >= 0 && newPos.first < GRID_SIZE && newPos.second >= 0 && newPos.second < GRID_SIZE && obstacles.find(newPos) == obstacles.end()) {
@@ -90,4 +92,68 @@ void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int
     }
 
     agents = bestSolution;
+}
+
+SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::unordered_map<std::string, std::string>& config) {
+    double initialTempMin = std::stod(config.at("initialTempMin"));
+    double initialTempMax = std::stod(config.at("initialTempMax"));
+    double coolingRateMin = std::stod(config.at("coolingRateMin"));
+    double coolingRateMax = std::stod(config.at("coolingRateMax"));
+    int maxIterationsMin = std::stoi(config.at("maxIterationsMin"));
+    int maxIterationsMax = std::stoi(config.at("maxIterationsMax"));
+    int steps = std::stoi(config.at("steps"));
+
+    std::vector<SAConfig> configs;
+
+    for (int i = 0; i <= steps; ++i) {
+        for (int j = 0; j <= steps; ++j) {
+            for (int k = 0; k <= steps; ++k) {
+                double initialTemp = initialTempMin + i * (initialTempMax - initialTempMin) / steps;
+                double coolingRate = coolingRateMin + j * (coolingRateMax - coolingRateMin) / steps;
+                int maxIterations = maxIterationsMin + k * (maxIterationsMax - maxIterationsMin) / steps;
+                configs.push_back({initialTemp, coolingRate, maxIterations});
+            }
+        }
+    }
+
+    SAConfig bestConfig = configs[0];
+    int bestCost = std::numeric_limits<int>::max();
+    int bestMakespan = std::numeric_limits<int>::max();
+    int bestSumOfCosts = std::numeric_limits<int>::max();
+    unsigned long bestDuration = std::numeric_limits<int>::max();
+
+
+    for (const auto& conf : configs) {
+        auto start = std::chrono::high_resolution_clock::now();
+        simulatedAnnealing(agents, obstacles, conf.initialTemp, conf.coolingRate, conf.maxIterations);
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+        int currentCost = calculateCost(agents, obstacles);
+        int makespan = 0;
+        int sumOfCosts = 0;
+        for (const auto& agent : agents) {
+            makespan = std::max(makespan, static_cast<int>(agent.path.size()));
+            sumOfCosts += static_cast<int>(agent.path.size());
+        }
+
+        std::cout << "Config: T=" << conf.initialTemp << ", CR=" << conf.coolingRate << ", Iter=" << conf.maxIterations
+                  << " | Cost: " << currentCost << ", Makespan: " << makespan << ", Sum of Costs: " << sumOfCosts << ", Duration: " << duration.count() << "ms" << std::endl;
+
+        if (currentCost < bestCost) {
+            bestConfig = conf;
+            bestCost = currentCost;
+            bestMakespan = makespan;
+            bestSumOfCosts = sumOfCosts;
+            bestDuration = duration.count();
+        }
+        // Reset agents after each run
+        resetAgents(agents);
+    }
+
+    std::cout << "Best Config: T=" << bestConfig.initialTemp << ", CR=" << bestConfig.coolingRate << ", Iter=" << bestConfig.maxIterations
+              << " | Cost: " << bestCost << ", Makespan: " << bestMakespan << ", Sum of Costs: " << bestSumOfCosts << ", Duration: " << bestDuration << "ms" << std::endl;
+
+
+    return bestConfig;
 }
