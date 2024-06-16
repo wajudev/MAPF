@@ -3,8 +3,6 @@
 //
 
 #include "../include/Visualization.h"
-#include "../include/Constants.h"
-#include "../include/SimulatedAnnealing.h"
 #include <thread>
 #include <iostream>
 

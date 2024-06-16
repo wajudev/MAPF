@@ -39,6 +39,7 @@ struct Agent {
           std::vector<std::pair<int, int>> path, sf::Color color, sf::Shape* shape)
             : id(id), start(start), goal(goal), path(std::move(std::move(path))), color(color), shape(shape) {}
 
+    bool isAtDestination() const;
 };
 
 std::vector<Agent> initializeAgents(int numAgents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles);
@@ -46,5 +47,6 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
 int manhattanDistance(std::pair<int, int> a, std::pair<int, int> b);
 void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::vector<Agent>& agents);
 std::unordered_set<std::pair<int, int>, pair_hash> generateObstacles(size_t numObstacles);
+
 
 #endif //MAPF_AGENT_H

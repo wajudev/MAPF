@@ -8,6 +8,16 @@
 #include <cstdlib>
 #include <random>
 
+// Check if the agent is at its destination
+bool Agent::isAtDestination() const {
+    return start == goal;
+}
+
+// Function to get a unique key for a position
+std::string getPositionKey(const std::pair<int, int>& position) {
+    return std::to_string(position.first) + "," + std::to_string(position.second);
+}
+
 std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> node, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles) {
     std::vector<std::pair<int, int>> neighbors;
     if (node.first > 0 && obstacles.find({node.first - 1, node.second}) == obstacles.end()) neighbors.emplace_back(node.first - 1, node.second);
@@ -37,9 +47,23 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
     agent.gScore[agent.start] = 0;
     agent.fScore[agent.start] = manhattanDistance(agent.start, agent.goal);
 
+    std::unordered_set<std::string> occupied_positions;
+
+    // Mark the initial positions of all agents as occupied
+    for (const auto &otherAgent : agents) {
+        if (otherAgent.id != agent.id) {
+            for (const auto& pos : otherAgent.path) {
+                occupied_positions.insert(getPositionKey(pos));
+            }
+        }
+    }
+
+    std::cout << "Initial occupied positions set." << std::endl;
+
     while (!agent.openSet.empty()) {
         auto current = agent.openSet.top().second;
         agent.openSet.pop();
+        std::cout << "Current position: (" << current.first << ", " << current.second << ")" << std::endl;
 
         if (current == agent.goal) {
             reconstructPath(agent, current);
@@ -51,10 +75,12 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
             return;
         }
 
-        for (auto neighbor : getNeighbors(current, obstacles)) {
+        for (const auto& neighbor : getNeighbors(current, obstacles)) {
+            std::cout << "Checking neighbor: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
             size_t tentative_gScore = agent.gScore[current] + 1;
+            std::cout << "Tentative gScore for neighbor: " << tentative_gScore << std::endl;
 
-            // Check for collisions with other agents
+            // Check for collisions with other agents and occupied positions
             bool collision = false;
             for (const auto& otherAgent : agents) {
                 if (otherAgent.id != agent.id) {
@@ -62,31 +88,48 @@ void aStar(Agent& agent, const std::unordered_set<std::pair<int, int>, pair_hash
                     if (!otherAgent.path.empty() && otherAgent.path.size() > tentative_gScore) {
                         if (neighbor == otherAgent.path[tentative_gScore] ||
                             (tentative_gScore > 0 && neighbor == otherAgent.path[tentative_gScore - 1] && current == otherAgent.path[tentative_gScore])) {
-                            collision = true;
+                            std::cout << "Collision detected with agent " << otherAgent.id << " at: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
                             break;
                         }
                     }
-                    // New check to avoid moving into a goal position of another agent
-                    if (!otherAgent.path.empty() && neighbor == otherAgent.goal && otherAgent.path.back() == otherAgent.goal) {
+                    // Check to avoid moving into a goal position of another agent
+                    if (!otherAgent.path.empty() && neighbor == otherAgent.goal && otherAgent.isAtDestination()) {
                         collision = true;
+                        std::cout << "Collision detected with the goal of agent " << otherAgent.id << " at: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
                         break;
                     }
                 }
             }
 
-            if (collision) continue;
+            // Check if the position is already occupied by another agent
+            if (occupied_positions.find(getPositionKey(neighbor)) != occupied_positions.end()) {
+                collision = true;
+                std::cout << "Position occupied by agent at: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
+            }
 
+            if (collision) {
+                std::cout << "Collision detected at: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
+                continue;
+            }
 
             if (agent.gScore.find(neighbor) == agent.gScore.end() || tentative_gScore < agent.gScore[neighbor]) {
                 agent.cameFrom[neighbor] = current;
                 agent.gScore[neighbor] = tentative_gScore;
                 agent.fScore[neighbor] = tentative_gScore + manhattanDistance(neighbor, agent.goal);
                 agent.openSet.emplace(agent.fScore[neighbor], neighbor);
+
+                // Mark the neighbor position as occupied
+                occupied_positions.insert(getPositionKey(neighbor));
+                std::cout << "Moved to: (" << neighbor.first << ", " << neighbor.second << ")" << std::endl;
             }
         }
     }
+    agent.path.clear();
     std::cout << "No path found for agent " << agent.id << std::endl;
 }
+
+
+
 
 void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, int& makespan, int& sumOfCosts) {
     makespan = 0;
@@ -98,6 +141,10 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
         agent.fScore.clear();
         while (!agent.openSet.empty()) agent.openSet.pop();
         aStar(agent, obstacles, agents);
+        if (agent.path.empty()) {
+            std::cerr << "Warning: No path found for agent " << agent.id << std::endl;
+            continue;
+        }
         makespan = std::max(makespan, (int) agent.path.size());
         sumOfCosts += (int) agent.path.size();
     }
@@ -106,6 +153,8 @@ void initializePaths(std::vector<Agent>& agents, const std::unordered_set<std::p
 int manhattanDistance(std::pair<int, int> a, std::pair<int, int> b) {
     return abs(a.first - b.first) + abs(a.second - b.second);
 }
+
+
 
 std::unordered_set<std::pair<int, int>, pair_hash> generateObstacles(size_t numObstacles) {
     std::unordered_set<std::pair<int, int>, pair_hash> obstacles;
