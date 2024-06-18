@@ -146,7 +146,7 @@ SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_se
     unsigned long bestDuration = std::numeric_limits<int>::max();
 
     // Open the file in append mode
-    std::string filename = "./logs/output_3.txt";
+    std::string filename = "./logs/output_7.txt";
     std::ofstream outFile(filename, std::ios_base::app);
 
     if (!outFile) {
