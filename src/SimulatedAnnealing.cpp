@@ -1,7 +1,3 @@
-//
-// Created by Lanre Ajibua on 26.05.24.
-//
-
 #include "../include/SimulatedAnnealing.h"
 #include "../include/Constants.h"
 #include "../include/Utils.h"
@@ -9,7 +5,8 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
-
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -73,7 +70,7 @@ void generateNeighbor(vector<Agent>& agents, mt19937& gen, uniform_int_distribut
     }
 }
 
-void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int>, pair_hash>& obstacles, double initialTemp, double coolingRate, int maxIterations) {
+vector<string> simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int>, pair_hash>& obstacles, double initialTemp, double coolingRate, int maxIterations) {
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> agentDist(0, (int) agents.size() - 1);
@@ -89,6 +86,8 @@ void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int
     for (const auto& agent : agents) {
         goals.insert(agent.goal);
     }
+
+    vector<string> iterationLogs;
 
     for (int iter = 0; iter < maxIterations && T > 1e-5; ++iter) {
         vector<Agent> newSolution = agents;
@@ -107,11 +106,15 @@ void simulatedAnnealing(vector<Agent>& agents, const unordered_set<pair<int, int
 
         T *= coolingRate;
 
-        // Debug output
-        cout << "Iteration " << iter << ", Temperature: " << T << ", Current Cost: " << currentCost << endl;
+        // Collect iteration logs
+        iterationLogs.push_back("Iteration " + to_string(iter) + ", Temperature: " + to_string(T) + 
+                                ", Current Cost: " + to_string(currentCost) + 
+                                ", Best Cost: " + to_string(bestCost) + 
+                                ", New Cost: " + to_string(newCost));
     }
 
     agents = bestSolution;
+    return iterationLogs;
 }
 
 SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_set<std::pair<int, int>, pair_hash>& obstacles, const std::unordered_map<std::string, std::string>& config) {
@@ -142,10 +145,18 @@ SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_se
     int bestSumOfCosts = std::numeric_limits<int>::max();
     unsigned long bestDuration = std::numeric_limits<int>::max();
 
+    // Open the file in append mode
+    std::string filename = ".logs/output_2.txt";
+    std::ofstream outFile(filename, std::ios_base::app);
+
+    if (!outFile) {
+        std::cerr << "Unable to open file " << filename << std::endl;
+        return bestConfig;
+    }
 
     for (const auto& conf : configs) {
         auto start = std::chrono::high_resolution_clock::now();
-        simulatedAnnealing(agents, obstacles, conf.initialTemp, conf.coolingRate, conf.maxIterations);
+        vector<string> iterationLogs = simulatedAnnealing(agents, obstacles, conf.initialTemp, conf.coolingRate, conf.maxIterations);
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
@@ -157,9 +168,10 @@ SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_se
             sumOfCosts += static_cast<int>(agent.path.size());
         }
 
-        // For Debugging
-        //std::cout << "Config: T=" << conf.initialTemp << ", CR=" << conf.coolingRate << ", Iter=" << conf.maxIterations
-        //          << " | Cost: " << currentCost << ", Makespan: " << makespan << ", Sum of Costs: " << sumOfCosts << ", Duration: " << duration.count() << "ms" << std::endl;
+        // Write iteration logs to the file
+        for (const auto& log : iterationLogs) {
+            outFile << log << std::endl;
+        }
 
         if (currentCost < bestCost) {
             bestConfig = conf;
@@ -172,9 +184,10 @@ SAConfig gridSearchSAConfigs(std::vector<Agent>& agents, const std::unordered_se
         resetAgents(agents);
     }
 
+    outFile.close();
+
     std::cout << "Best Config: T=" << bestConfig.initialTemp << ", CR=" << bestConfig.coolingRate << ", Iter=" << bestConfig.maxIterations
               << " | Cost: " << bestCost << ", Makespan: " << bestMakespan << ", Sum of Costs: " << bestSumOfCosts << ", Duration: " << bestDuration << "ms" << std::endl;
-
 
     return bestConfig;
 }

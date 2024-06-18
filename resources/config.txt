@@ -1,7 +1,8 @@
 initialTempMin=500
-initialTempMax=2000
-coolingRateMin=0.99
+initialTempMax=3000
+coolingRateMin=0.95
 coolingRateMax=0.999
-maxIterationsMin=10
-maxIterationsMax=100
-steps=3
+maxIterationsMin=100
+maxIterationsMax=200
+steps=5
+
